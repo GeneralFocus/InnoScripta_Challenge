@@ -7,9 +7,9 @@ namespace App\Providers;
 use App\Contracts\Repositories\ArticleRepositoryInterface;
 use App\Repositories\ArticleRepository;
 use App\Services\ArticleService;
-use App\Services\NewsProviders\GuardianProvider;
-use App\Services\NewsProviders\NewsApiProvider;
-use App\Services\NewsProviders\NYTimesProvider;
+use App\Services\NewsServices\GuardianService;
+use App\Services\NewsServices\NewsApiService;
+use App\Services\NewsServices\NYTimesService;
 use Illuminate\Support\ServiceProvider;
 
 class NewsServiceProvider extends ServiceProvider
@@ -21,11 +21,14 @@ class NewsServiceProvider extends ServiceProvider
             ArticleRepository::class
         );
 
-        $this->app->tag([
-            NewsApiProvider::class,
-            GuardianProvider::class,
-            NYTimesProvider::class,
-        ], 'news.providers');
+        $this->app->tag(
+            [
+                NewsApiService::class,
+                GuardianService::class,
+                NYTimesService::class,
+            ],
+            'news.providers'
+        );
 
         $this->app->singleton(ArticleService::class, function ($app) {
             $providers = $app->tagged('news.providers');
