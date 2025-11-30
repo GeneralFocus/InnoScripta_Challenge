@@ -68,7 +68,10 @@ class ArticleService
             $skipped = 0;
 
             foreach ($articles as $dto) {
-                if ($this->repository->existsByExternalId($dto->externalId)) {
+                if (
+                    $this->repository->existsByExternalId($dto->externalId)
+                    || $this->repository->existsByUrl($dto->url)
+                ) {
                     $skipped++;
                     continue;
                 }
