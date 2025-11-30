@@ -38,6 +38,7 @@ class ArticleControllerTest extends TestCase
         $article->setRelation('category', new Category(['name' => 'Demo Category']));
 
         $paginator = new LengthAwarePaginator([$article], 1, 15);
+        $paginator->setPath(url('/api/v1/articles'));
 
         $service = Mockery::mock(ArticleService::class);
         $service->shouldReceive('getArticles')
@@ -49,8 +50,8 @@ class ArticleControllerTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('status', 'success')
-            ->assertJsonPath('data.0.title', 'Sample')
-            ->assertJsonPath('data.0.source', 'Demo Source');
+            ->assertJsonPath('data.data.0.title', 'Sample')
+            ->assertJsonPath('data.links.first', url('/api/v1/articles?page=1'));
     }
 
     public function test_show_returns_not_found_when_article_missing(): void
