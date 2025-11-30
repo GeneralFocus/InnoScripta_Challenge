@@ -22,9 +22,6 @@ abstract class AbstractNewsProvider implements NewsProviderInterface
         ]);
     }
 
-    /**
-     * Make HTTP request to provider API
-     */
     protected function makeRequest(string $url, array $params = []): ?array
     {
         try {
@@ -53,13 +50,7 @@ abstract class AbstractNewsProvider implements NewsProviderInterface
         }
     }
 
-    /**
-     * Get API key from environment
-     */
     abstract protected function getApiKey(): string;
 
-    /**
-     * Get base URL for the provider
-     */
     abstract protected function getBaseUrl(): string;
 }
