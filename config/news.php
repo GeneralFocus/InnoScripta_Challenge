@@ -24,7 +24,7 @@ return [
 
 
     'fetch' => [
-        'schedule' => env('NEWS_FETCH_SCHEDULE', '*/6'), // Every 6 hours
+        'schedule' => env('NEWS_FETCH_SCHEDULE', '0 */6 * * *'), // Every 6 hours
         'timeout' => env('NEWS_FETCH_TIMEOUT', 30),
         'max_articles_per_provider' => env('NEWS_MAX_ARTICLES', 100),
     ],
