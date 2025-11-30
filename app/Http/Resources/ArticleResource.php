@@ -9,18 +9,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ArticleResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     */
     public function toArray(Request $request): array
     {
         return [
             'id'          => $this->id,
             'title'       => $this->title,
-            'summary'     => $this->summary,
+            'description' => $this->description,
             'content'     => $this->content,
-            'source'      => $this->source?->name ?? $this->source,
-            'category'    => $this->category?->name ?? $this->category,
+            'source'      => $this->source?->name,
+            'category'    => $this->category?->name,
             'author'      => $this->author,
             'url'         => $this->url,
             'image_url'   => $this->image_url,
