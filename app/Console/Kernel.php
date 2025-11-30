@@ -12,13 +12,13 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         $schedule->command('news:fetch')
-            ->everySixHours()
+            ->cron(config('news.fetch.schedule', '0 */6 * * *'))
             ->withoutOverlapping()
             ->runInBackground()
-            ->onSuccess(function () {
+            ->onSuccess(function (): void {
                 logger()->info('News articles fetched successfully');
             })
-            ->onFailure(function () {
+            ->onFailure(function (): void {
                 logger()->error('News articles fetch failed');
             });
     }
