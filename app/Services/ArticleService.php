@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Contracts\NewsProviderInterface;
 use App\Contracts\Repositories\ArticleRepositoryInterface;
 use App\DTOs\NormalizedArticleDTO;
+use App\Models\Article;
 use App\Models\Category;
 use App\Models\Source;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -27,11 +28,11 @@ class ArticleService
         return $this->repository->getPaginated($filters, $perPage);
     }
 
-    public function getArticle(int $id): ?array
+    public function getArticle(int $id): ?Article
     {
         $article = $this->repository->find($id);
 
-        return $article?->load(['source', 'category'])->toArray();
+        return $article?->load(['source', 'category']);
     }
 
     public function fetchFromAllProviders(): array
@@ -95,7 +96,7 @@ class ArticleService
         }
     }
 
-    private function persistArticle(NormalizedArticleDTO $dto): void
+    protected function persistArticle(NormalizedArticleDTO $dto): void
     {
         DB::transaction(function () use ($dto) {
             $source = $this->getOrCreateSource($dto->sourceName, $dto->provider);
@@ -118,7 +119,7 @@ class ArticleService
         });
     }
 
-    private function getOrCreateSource(string $name, string $provider): Source
+    protected function getOrCreateSource(string $name, string $provider): Source
     {
         $slug = Str::slug($name);
 
@@ -131,7 +132,7 @@ class ArticleService
         );
     }
 
-    private function getOrCreateCategory(string $name): Category
+    protected function getOrCreateCategory(string $name): Category
     {
         $slug = Str::slug($name);
 
