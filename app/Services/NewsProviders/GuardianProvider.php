@@ -16,31 +16,43 @@ class GuardianProvider extends AbstractNewsProvider
 
     protected function getBaseUrl(): string
     {
-        return config('news.providers.guardian.base_url');
+        return (string) config('news.providers.guardian.base_url');
     }
 
     public function getProviderName(): string
     {
-        return 'nytimes';
+        return 'guardian';
     }
 
     public function fetchArticles(): array
     {
-        $url = $this->getBaseUrl() . '/topstories/v2/home.json';
+        if (!config('news.providers.guardian.enabled')) {
+            return [];
+        }
+
+        $url = $this->getBaseUrl() . '/search';
 
         $data = $this->makeRequest($url, [
-            'api-key' => $this->getApiKey(),
+            'api-key'     => $this->getApiKey(),
+            'show-fields' => 'trailText,body,thumbnail,byline',
+            'page-size'   => (int) config('news.fetch.max_articles_per_provider', 100),
+            'order-by'    => 'newest',
         ]);
 
-        if (!$data || !isset($data['results']) || !is_array($data['results'])) {
+        if (
+            !$data
+            || !isset($data['response']['results'])
+            || !is_array($data['response']['results'])
+        ) {
             return [];
         }
 
         $normalized = [];
-        foreach ($data['results'] as $article) {
+        foreach ($data['response']['results'] as $article) {
             if (!is_array($article)) {
                 continue;
             }
+
             $normalized[] = $this->normalize($article);
         }
 
@@ -49,23 +61,20 @@ class GuardianProvider extends AbstractNewsProvider
 
     private function normalize(array $article): NormalizedArticleDTO
     {
-        $imageUrl = null;
-        if (isset($article['multimedia'][0]['url'])) {
-            $imageUrl = $article['multimedia'][0]['url'];
-        }
+        $fields = $article['fields'] ?? [];
 
         return new NormalizedArticleDTO(
-            externalId: 'nytimes_' . ($article['uri'] ?? uniqid()),
-            title: $article['title'] ?? 'Untitled',
-            description: $article['abstract'] ?? null,
-            content: $article['abstract'] ?? null,
-            author: $article['byline'] ?? null,
-            url: $article['url'] ?? '',
-            imageUrl: $imageUrl,
-            publishedAt: $this->parseDate($article['published_date'] ?? null),
-            sourceName: 'The New York Times',
+            externalId: 'guardian_' . ($article['id'] ?? uniqid()),
+            title: $article['webTitle'] ?? 'Untitled',
+            description: $fields['trailText'] ?? null,
+            content: $fields['body'] ?? $fields['trailText'] ?? null,
+            author: $fields['byline'] ?? null,
+            url: $article['webUrl'] ?? '',
+            imageUrl: $fields['thumbnail'] ?? null,
+            publishedAt: $this->parseDate($article['webPublicationDate'] ?? null),
+            sourceName: 'The Guardian',
             provider: $this->getProviderName(),
-            categoryName: $article['section'] ?? null,
+            categoryName: $article['sectionName'] ?? null,
         );
     }
 
@@ -77,7 +86,7 @@ class GuardianProvider extends AbstractNewsProvider
 
         try {
             return Carbon::parse($date)->toDateTimeString();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return now()->toDateTimeString();
         }
     }
