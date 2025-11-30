@@ -16,11 +16,8 @@ class Controller extends BaseController
     use AuthorizesRequests;
     use ValidatesRequests;
 
-    protected function success(
-        string $message,
-        array|JsonResource|AnonymousResourceCollection $data = [],
-        int $status = 200
-    ): JsonResponse {
+    protected function success(string $message, array|JsonResource|AnonymousResourceCollection $data = [], int $status = 200): JsonResponse
+    {
         return response()->json([
             'status' => 'success',
             'message' => $message,
