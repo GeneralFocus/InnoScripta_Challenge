@@ -16,7 +16,7 @@ class NYTimesProvider extends AbstractNewsProvider
 
     protected function getBaseUrl(): string
     {
-        return config('news.providers.nytimes.base_url');
+        return (string) config('news.providers.nytimes.base_url');
     }
 
     public function getProviderName(): string
@@ -26,6 +26,10 @@ class NYTimesProvider extends AbstractNewsProvider
 
     public function fetchArticles(): array
     {
+        if (!config('news.providers.nytimes.enabled')) {
+            return [];
+        }
+
         $url = $this->getBaseUrl() . '/topstories/v2/home.json';
 
         $data = $this->makeRequest($url, [
@@ -41,6 +45,7 @@ class NYTimesProvider extends AbstractNewsProvider
             if (!is_array($article)) {
                 continue;
             }
+
             $normalized[] = $this->normalize($article);
         }
 
@@ -77,7 +82,7 @@ class NYTimesProvider extends AbstractNewsProvider
 
         try {
             return Carbon::parse($date)->toDateTimeString();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return now()->toDateTimeString();
         }
     }
