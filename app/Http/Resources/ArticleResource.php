@@ -24,7 +24,7 @@ class ArticleResource extends JsonResource
             'author'      => $this->author,
             'url'         => $this->url,
             'image_url'   => $this->image_url,
-            'published_at'=> $this->published_at,
+            'published_at' => $this->published_at,
         ];
     }
 }
