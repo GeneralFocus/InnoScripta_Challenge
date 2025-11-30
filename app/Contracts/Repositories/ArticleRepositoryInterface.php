@@ -16,4 +16,6 @@ interface ArticleRepositoryInterface
     public function upsert(array $data): Article;
 
     public function existsByExternalId(string $externalId): bool;
+
+    public function existsByUrl(string $url): bool;
 }
