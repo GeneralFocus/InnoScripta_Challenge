@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services\NewsProviders;
+
+use App\Contracts\NewsProviderInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Support\Facades\Log;
+
+abstract class AbstractNewsProvider implements NewsProviderInterface
+{
+    protected Client $client;
+
+    public function __construct(?Client $client = null)
+    {
+        $this->client = $client ?? new Client([
+            'timeout' => 30,
+            'connect_timeout' => 10,
+            'http_errors' => false,
+        ]);
+    }
+
+    /**
+     * Make HTTP request to provider API
+     */
+    protected function makeRequest(string $url, array $params = []): ?array
+    {
+        try {
+            $response = $this->client->get($url, [
+                'query' => $params,
+            ]);
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode !== 200) {
+                Log::warning("{$this->getProviderName()} API returned status {$statusCode}");
+                return null;
+            }
+
+            $body = json_decode((string) $response->getBody(), true);
+
+            if (!is_array($body)) {
+                Log::error("{$this->getProviderName()} API returned invalid JSON");
+                return null;
+            }
+
+            return $body;
+        } catch (GuzzleException $e) {
+            Log::error("{$this->getProviderName()} API request failed: {$e->getMessage()}");
+            return null;
+        }
+    }
+
+    /**
+     * Get API key from environment
+     */
+    abstract protected function getApiKey(): string;
+
+    /**
+     * Get base URL for the provider
+     */
+    abstract protected function getBaseUrl(): string;
+}
