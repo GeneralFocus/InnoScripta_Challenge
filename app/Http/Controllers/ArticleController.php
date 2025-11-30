@@ -22,10 +22,11 @@ class ArticleController extends Controller
             $request->getPerPage()
         );
 
-        return $this->success(
-            'Articles retrieved',
-            ArticleResource::collection($articles)
-        );
+        $payload = ArticleResource::collection($articles)
+            ->response()
+            ->getData(true);
+
+        return $this->success('Articles retrieved', $payload);
     }
 
     public function show(string $id): JsonResponse
