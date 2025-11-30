@@ -43,4 +43,9 @@ class ArticleRepository implements ArticleRepositoryInterface
     {
         return Article::where('external_id', $externalId)->exists();
     }
+
+    public function existsByUrl(string $url): bool
+    {
+        return Article::where('url', $url)->exists();
+    }
 }
