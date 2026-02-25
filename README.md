@@ -28,7 +28,7 @@ A production-ready, enterprise-grade news aggregation platform that fetches, nor
 
 ```bash
 # 1. Clone the repository
-git clone git@github.com:GeneralFocus/InnoScripta_Challenge.git
+git clone git@github.com:GeneralFocus/News-Aggregator-System-Laravel.git
 cd InnoScripta_Challenge
 
 # 2. Install dependencies
